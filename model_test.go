@@ -769,6 +769,19 @@ func TestTemporalRolesModelWithDomain(t *testing.T) {
 	testDomainEnforce(t, e, "alice", "domain_not_exist", "data8", "write", false)
 }
 
+func TestTemporalRolesModelWithDomainTransitive(t *testing.T) {
+	e, _ := NewEnforcer("examples/rbac_with_domain_temporal_roles_model.conf", "examples/rbac_with_domain_temporal_roles_transitive_policy.csv")
+
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "role_mid", "domainx", util.TimeMatchFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "role_mid", "role_top", "domainx", util.TimeMatchFunc)
+	e.AddNamedDomainLinkConditionFunc("g", "alice", "role_solo", "domainx", util.TimeMatchFunc)
+
+	// single-hop expired link -> correctly denied (control)
+	testDomainEnforce(t, e, "alice", "domainx", "data_solo", "read", false)
+	// two-hop chain whose 2nd link is expired -> must be denied as well
+	testDomainEnforce(t, e, "alice", "domainx", "data_top", "read", false)
+}
+
 func TestReBACModel(t *testing.T) {
 	e, _ := NewEnforcer("examples/rebac_model.conf", "examples/rebac_policy.csv")
 

@@ -817,7 +817,7 @@ func (crm *ConditionalRoleManager) hasLinkHelper(targetName string, roles map[st
 		})
 	}
 
-	return crm.hasLinkHelper(targetName, nextRoles, level-1)
+	return crm.hasLinkHelper(targetName, nextRoles, level-1, domains...)
 }
 
 func (crm *ConditionalRoleManager) getNextRoles(currentRole, nextRole *Role, domains []string, nextRoles map[string]*Role) bool {
